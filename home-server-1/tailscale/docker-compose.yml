@@ -4,7 +4,7 @@ services:
     container_name: tailscale
     hostname: home-server-1
     environment:
-      - TS_AUTHKEY=tskey-client-kjuSAYfih621CNTRL-udMWT4pSc7W7A7Gcmo4B7WpQNUPbzQR4
+      - TS_AUTHKEY=${TS_AUTHKEY}
       - TS_EXTRA_ARGS=--advertise-tags=tag:container --advertise-exit-node
       - TS_STATE_DIR=/var/lib/tailscale
       - TS_USERSPACE=false
