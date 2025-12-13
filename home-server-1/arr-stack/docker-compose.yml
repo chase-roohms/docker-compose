@@ -1,0 +1,276 @@
+services:
+########## NETWORK MANAGER #####################################################
+  gluetun:          # Docker VPN client
+    # Docs: https://github.com/qdm12/gluetun-wiki
+    image: qmcgaw/gluetun:latest
+    container_name: gluetun
+    cap_add:
+      - NET_ADMIN
+    devices:
+      - /dev/net/tun:/dev/net/tun
+    ports:
+      - 6881:6881       # qBittorrent P2P Connections
+      - 6881:6881/udp   # qBittorrent P2P Connections
+      - 9090:8000       # gluetun Control Server
+      - 9061:9061       # qBittorrent WebUI
+#      - 9062:9062       # SABnzbd WebUI
+    environment:
+      - VPN_SERVICE_PROVIDER=${VPN_SERVICE_PROVIDER}
+      - OPENVPN_USER=${OPENVPN_USER}
+      - OPENVPN_PASSWORD=${OPENVPN_PASSWORD}
+      - SERVER_COUNTRIES=${SERVER_COUNTRIES}
+    volumes:
+      - ${ARR_STACK_ROOT_DIR}/gluetun/data:/gluetun
+      - ${ARR_STACK_ROOT_DIR}/gluetun/config/config.toml:/gluetun/auth/config.toml
+    restart: unless-stopped
+
+
+########## DOWNLOAD CLIENTS ####################################################
+  qbittorrent:      # P2P torrent client
+    # Docs: https://github.com/qbittorrent/qBittorrent/wiki
+    image: lscr.io/linuxserver/qbittorrent:latest
+    container_name: qbittorrent
+    network_mode: "service:gluetun"
+    depends_on:
+      - gluetun
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=${TZ}
+      - WEBUI_PORT=9061
+    volumes:
+      - ${ARR_STACK_ROOT_DIR}/qbittorrent:/config
+      - ${ARR_STACK_ROOT_DIR}/downloads:/downloads
+    restart: unless-stopped
+
+  sabnzbd:          # NZB download client
+    # Docs: https://sabnzbd.org/wiki/
+    image: linuxserver/sabnzbd:latest
+    container_name: sabnzbd
+#    network_mode: "service:gluetun"
+#    depends_on:
+#      - gluetun
+    ports:
+      - 9062:9062
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=${TZ}
+    volumes:
+      - ${ARR_STACK_ROOT_DIR}/sabnzbd/config:/config
+      - ${ARR_STACK_ROOT_DIR}/downloads:/downloads
+      - ${ARR_STACK_ROOT_DIR}/sabnzbd/temporary:/incomplete-downloads
+    restart: unless-stopped
+
+
+############# STARR APPS #######################################################
+  prowlarr:         # Manages and syncs indexers
+    # Docs: https://wiki.servarr.com/prowlarr
+    image: lscr.io/linuxserver/prowlarr:latest
+    container_name: prowlarr
+    ports:
+      - 9071:9071
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=${TZ}
+      - DOCKER_MODS=${THEME_PARK}:prowlarr
+      - TP_THEME=${TP_THEME}
+      - TP_ADDON=prowlarr-text-logo
+    volumes:
+      - ${ARR_STACK_ROOT_DIR}/prowlarr/data:/config
+    restart: unless-stopped
+
+  sonarr:           # Shows
+    # Docs: https://wiki.servarr.com/sonarr
+    image: lscr.io/linuxserver/sonarr:latest
+    container_name: sonarr
+    ports:
+      - 9072:9072
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=${TZ}
+      - DOCKER_MODS=${THEME_PARK}:sonarr
+      - TP_THEME=${TP_THEME}
+      - TP_ADDON=sonarr-text-logo
+    volumes:
+      - ${ARR_STACK_ROOT_DIR}/sonarr/data:/config
+      - ${ARR_STACK_ROOT_DIR}/downloads:/downloads
+      - ${PLEX_MEDIA_ROOT_DIR}/shows:/tv
+    restart: unless-stopped
+
+  radarr:           # Movies
+    # Docs: https://wiki.servarr.com/radarr
+    image: lscr.io/linuxserver/radarr:latest
+    container_name: radarr
+    ports:
+      - 9073:9073
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=${TZ}
+      - DOCKER_MODS=${THEME_PARK}:radarr
+      - TP_THEME=${TP_THEME}
+    volumes:
+      - ${ARR_STACK_ROOT_DIR}/radarr/data:/config
+      - ${PLEX_MEDIA_ROOT_DIR}/movies:/movies
+      - ${ARR_STACK_ROOT_DIR}/downloads:/downloads
+      - ${ARR_STACK_ROOT_DIR}/scripts:/scripts
+    restart: unless-stopped
+
+#  tunarr:           # Live TV / Homerun
+#    # https://tunarr.com/
+#    image: chrisbenincasa/tunarr:latest-nvidia
+#    runtime: nvidia
+#    container_name: tunarr
+#    ports:
+#      - 9074:8000
+#    environment:
+#      - LOG_LEVEL=INFO
+#      - NVIDIA_VISIBLE_DEVICES=GPU-44e6d249-5f8e-53fa-2294-6e743478fbe1
+#      - TZ=${TZ}
+#    volumes:
+#      - ${ARR_STACK_ROOT_DIR}/tunarr/data:/config
+
+  huntarr:
+    image: huntarr/huntarr:latest
+    container_name: huntarr
+    restart: always
+    ports:
+      - 9077:9705
+    environment:
+      - TZ=${TZ}
+    volumes:
+      - ${ARR_STACK_ROOT_DIR}//huntarr:/config
+
+  bazarr:           # Subtitles
+    # Docs: https://wiki.bazarr.media/
+    image: ghcr.io/linuxserver/bazarr:latest
+    container_name: bazarr
+    ports:
+      - 9078:6767
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=${TZ}
+      - DOCKER_MODS=${THEME_PARK}:bazarr
+      - TP_THEME=${TP_THEME}
+    volumes:
+      - ${ARR_STACK_ROOT_DIR}/bazarr:/config
+      - ${PLEX_MEDIA_ROOT_DIR}/movies:/movies
+      - ${PLEX_MEDIA_ROOT_DIR}/shows:/tv
+    restart: unless-stopped
+
+  seerr:      # Media requester
+    # Docs: https://docs.jellyseerr.dev/
+    image: fallenbagel/jellyseerr:latest
+    container_name: seerr
+    ports:
+      - 9079:5055
+    environment:
+      - LOG_LEVEL=info
+      - TZ=${TZ}
+    volumes:
+      - ${ARR_STACK_ROOT_DIR}/jellyseer/data:/app/config
+    restart: unless-stopped
+
+############### EXTRAS #########################################################
+  tautulli:         # Plex monitoring
+    # Docs: https://docs.tautulli.com/
+    image: ghcr.io/tautulli/tautulli:latest
+    container_name: tautulli
+    restart: unless-stopped
+    ports:
+      - 9091:8181
+    environment:
+      - PUID=1001
+      - PGID=1001
+      - TZ=${TZ}
+    volumes:
+      - ${ARR_STACK_ROOT_DIR}/tautulli:/config
+
+  flaresolverr:     # Cloudflare solver for Prowlarr
+    # Docs: https://trash-guides.info/Prowlarr/prowlarr-setup-flaresolverr/
+    image: ghcr.io/flaresolverr/flaresolverr:latest
+    container_name: flaresolverr
+    ports:
+      - 9092:8191
+    environment:
+      - LOG_LEVEL=${LOG_LEVEL:-info}
+      - LOG_HTML=${LOG_HTML:-false}
+      - CAPTCHA_SOLVER=${CAPTCHA_SOLVER:-none}
+      - TZ=${TZ}
+    volumes:
+      - ${ARR_STACK_ROOT_DIR}/flaresolverr/data:/config
+    restart: unless-stopped
+
+  kometa:           # Manages Plex metadata, posters, etc
+    # Docs: https://kometa.wiki/en/latest/
+    # Config here: https://github.com/ChaseRoohms/kometa-configs
+    image: kometateam/kometa:nightly # temporary to fix some imdb issues
+    container_name: kometa
+    environment:
+      - TZ=${TZ}
+    volumes:
+      - ${ARR_STACK_ROOT_DIR}/kometa/config:/config
+    restart: unless-stopped
+
+  whisperasr:       # AI subtitle generation for Bazarr
+    # Docs: https://wiki.bazarr.media/Additional-Configuration/Whisper-Provider/
+    image: onerahmet/openai-whisper-asr-webservice:latest-gpu
+    container_name: whisper-ai
+    ports:
+      - 9094:9000
+    environment:
+      - ASR_MODEL=small
+      - ASR_ENGINE=faster_whisper
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    restart: unless-stopped
+
+  wizarr:            # Plex Invite Manager
+    # Docs: https://docs.wizarr.dev/
+    container_name: wizarr
+    image: ghcr.io/wizarrrr/wizarr
+    ports:
+      - 9095:5690
+    volumes:
+      - ${ARR_STACK_ROOT_DIR}/wizarr/database:/data/database
+      - ${ARR_STACK_ROOT_DIR}/wizarr/wizard:/data/wizard_steps
+    environment:
+      - APP_URL=https://invite.${DOMAIN}
+      - DISABLE_BUILTIN_AUTH=false
+      - TZ=${TZ}
+
+  metube:            # YouTube video downloader
+    # Docs: https://github.com/alexta69/metube/wiki
+    image: alexta69/metube:latest
+    container_name: metube
+    ports:
+      - 9096:8081
+    environment:
+      - UID=1000
+      - GID=1000
+      - TZ=${TZ}
+      - OUTPUT_TEMPLATE=%(title)s [WEBRIP-%(height)sp]-yt-dlp.%(ext)s
+      - YTDL_OPTIONS_FILE=/config/ytdl_options.json
+    volumes:
+      - ${ARR_STACK_ROOT_DIR}/downloads:/downloads
+      - ${ARR_STACK_ROOT_DIR}/metube/config:/config
+    restart: unless-stopped
+
+  recyclarr:
+    image: recyclarr/recyclarr:latest
+    container_name: recyclarr
+    user: 1000:1000
+    volumes:
+      - ${ARR_STACK_ROOT_DIR}/recyclarr/config:/config
+    environment:
+      - TZ=${TZ}
+    restart: unless-stopped
