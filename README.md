@@ -9,6 +9,7 @@ alias dockdate="docker compose pull && docker compose up -d"
 ```shell
 git clone --no-checkout https://github.com/chase-roohms/docker-compose.git
 cd ./docker-compose
+git sparse-checkout init --no-cone
 
 git sparse-checkout set \
   /replace-me/** \
