@@ -15,5 +15,6 @@ git sparse-checkout set \
   /replace-me/** \
   .gitignore
 
-git checkout -b main origin/main
+git checkout
+git pull
 ```
