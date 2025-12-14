@@ -1,0 +1,12 @@
+services:
+  crowdsec:
+    image: crowdsecurity/crowdsec
+    container_name: crowdsec
+    restart: always
+    environment:
+      COLLECTIONS: "crowdsecurity/nginx-proxy-manager"
+      GID: "${GID-1000}"
+    volumes:
+      - /home/neonvariant/docker/nginx-proxy-manager/data/logs:/var/log/nginx-proxy-manager
+      - /home/neonvariant/docker/crowdsec/crowdsec-db:/var/lib/crowdsec/data/
+      - /home/neonvariant/docker/crowdsec/crowdsec-config:/etc/crowdsec/
