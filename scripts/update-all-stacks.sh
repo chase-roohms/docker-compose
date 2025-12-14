@@ -37,6 +37,12 @@ for dir in */; do
     dir="${dir%/}"
     
     if [ -d "$dir" ]; then
+        # Check if directory contains a docker-compose.yml file
+        if [ ! -f "$dir/docker-compose.yml" ] && [ ! -f "$dir/docker-compose.yaml" ] && [ ! -f "$dir/compose.yml" ] && [ ! -f "$dir/compose.yaml" ]; then
+            echo "Skipping $dir (no compose file found)"
+            continue
+        fi
+        
         echo "Processing: $dir"
         cd "$dir" || continue
         
