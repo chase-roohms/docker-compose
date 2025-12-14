@@ -23,10 +23,10 @@ if [ ! -d "$ROOT_DIR" ]; then
     exit 1
 fi
 
-echo "Using root directory: $ROOT_DIR"
+# Convert to absolute path
+ROOT_DIR="$(cd "$ROOT_DIR" && pwd)"
 
-# Save the original directory
-ORIGINAL_DIR="$(pwd)"
+echo "Using root directory: $ROOT_DIR"
 
 # Change to root directory
 cd "$ROOT_DIR" || exit 1
@@ -47,8 +47,5 @@ for dir in */; do
         cd "$ROOT_DIR" || exit 1
     fi
 done
-
-# Return to original directory
-cd "$ORIGINAL_DIR" || exit 1
 
 echo "Done!"
