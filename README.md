@@ -13,6 +13,7 @@ git sparse-checkout init --no-cone
 
 git sparse-checkout set \
   /replace-me/** \
+  /scripts/** \
   .gitignore
 
 git checkout
