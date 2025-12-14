@@ -23,14 +23,6 @@ if [ ! -d "$ROOT_DIR" ]; then
     exit 1
 fi
 
-# Check if dockdate command exists (alias, function, or executable)
-if ! type dockdate &> /dev/null; then
-    echo "Error: 'dockdate' command not found"
-    echo "Please ensure dockdate is installed or defined as an alias/function"
-    echo "dockdate command should run 'docker compose pull && docker compose up -d'"
-    exit 1
-fi
-
 echo "Using root directory: $ROOT_DIR"
 
 # Save the original directory
@@ -48,8 +40,8 @@ for dir in */; do
         echo "Processing: $dir"
         cd "$dir" || continue
         
-        # Run dockdate command
-        dockdate
+        # Run docker compose pull and up -d
+        docker compose pull && docker compose up -d
         
         # Return to root directory
         cd "$ROOT_DIR" || exit 1
