@@ -3,6 +3,7 @@
 ## Useful Aliases
 ```shell
 alias dockdate="docker compose pull && docker compose up -d"
+alias dockdate_all="bash /home/neonvariant/docker/docker-compose/scripts/update-all-stacks.sh /home/neonvariant/docker/docker-compose/REPLACEME"
 ```
 
 ## Setting up a machine
@@ -12,9 +13,9 @@ cd ./docker-compose
 git sparse-checkout init --no-cone
 
 git sparse-checkout set \
-  /replace-me/** \
+  /.gitignore \
   /scripts/** \
-  .gitignore
+  /REPLACEME/**
 
 git checkout
 git pull
