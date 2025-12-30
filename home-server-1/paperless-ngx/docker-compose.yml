@@ -1,22 +1,50 @@
+# Docker Compose file for running paperless from the docker container registry.
+# This file contains everything paperless needs to run.
+# Paperless supports amd64, arm and arm64 hardware.
+#
+# All compose files of paperless configure paperless in the following way:
+#
+# - Paperless is (re)started on system boot, if it was running before shutdown.
+# - Docker volumes for storing data are managed by Docker.
+# - Folders for importing and exporting files are created in the same directory
+#   as this file and mounted to the correct folders inside the container.
+# - Paperless listens on port 8000.
+#
+# In addition to that, this Docker Compose file adds the following optional
+# configurations:
+#
+# - Instead of SQLite (default), PostgreSQL is used as the database server.
+# - Apache Tika and Gotenberg servers are started with paperless and paperless
+#   is configured to use these services. These provide support for consuming
+#   Office documents (Word, Excel, PowerPoint and their LibreOffice counter-
+#   parts).
+#
+# To install and update paperless with this file, do the following:
+#
+# - Copy this file as 'docker-compose.yml' and the files 'docker-compose.env'
+#   and '.env' into a folder.
+# - Run 'docker compose pull'.
+# - Run 'docker compose up -d'.
+#
+# For more extensive installation and update instructions, refer to the
+# documentation.
 services:
   broker:
-    image: docker.io/library/redis:7
+    image: docker.io/library/redis:8
     container_name: paperless-broker
     restart: unless-stopped
     volumes:
-      - /home/neonvariant/docker/paperless-ngx/redis/redisdata:/data
-
+      - redisdata:/data
   db:
-    image: docker.io/library/postgres:15
+    image: docker.io/library/postgres:18
     container_name: paperless-db
     restart: unless-stopped
     volumes:
-      - /home/neonvariant/docker/paperless-ngx/postgres/pgdata:/var/lib/postgresql/data
+      - pgdata:/var/lib/postgresql
     environment:
       POSTGRES_DB: paperless
       POSTGRES_USER: paperless
       POSTGRES_PASSWORD: paperless
-
   webserver:
     image: ghcr.io/paperless-ngx/paperless-ngx:latest
     container_name: paperless-webserver
@@ -29,8 +57,8 @@ services:
     ports:
       - "8000:8000"
     volumes:
-      - /home/neonvariant/docker/paperless-ngx/data:/usr/src/paperless/data
-      - /home/neonvariant/docker/paperless-ngx/media:/usr/src/paperless/media
+      - data:/usr/src/paperless/data
+      - media:/usr/src/paperless/media
       - /home/neonvariant/docker/paperless-ngx/export:/usr/src/paperless/export
       - /home/neonvariant/docker/paperless-ngx/consume:/usr/src/paperless/consume
     env_file: docker-compose.env
@@ -40,17 +68,22 @@ services:
       PAPERLESS_TIKA_ENABLED: 1
       PAPERLESS_TIKA_GOTENBERG_ENDPOINT: http://gotenberg:3000
       PAPERLESS_TIKA_ENDPOINT: http://tika:9998
-
   gotenberg:
-    image: docker.io/gotenberg/gotenberg:7.10
+    image: docker.io/gotenberg/gotenberg:8.25
     container_name: paperless-gotenberg
     restart: unless-stopped
+    # The gotenberg chromium route is used to convert .eml files. We do not
+    # want to allow external content like tracking pixels or even javascript.
     command:
       - "gotenberg"
       - "--chromium-disable-javascript=true"
       - "--chromium-allow-list=file:///tmp/.*"
-
   tika:
-    image: ghcr.io/paperless-ngx/tika:latest
+    image: docker.io/apache/tika:latest
     container_name: paperless-tika
     restart: unless-stopped
+volumes:
+  data:
+  media:
+  pgdata:
+  redisdata:
