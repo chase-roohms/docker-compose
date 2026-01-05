@@ -3,6 +3,7 @@ services:
     image: tailscale/tailscale:latest
     container_name: tailscale
     hostname: home-server-1
+    network_mode: host
     environment:
       - TS_AUTHKEY=${TS_AUTHKEY}
       - TS_EXTRA_ARGS=--advertise-tags=tag:container --advertise-exit-node
