@@ -2,6 +2,7 @@
 services:
   foundry:
     image: felddy/foundryvtt:13
+    container_name: foundry-vtt
     hostname: home-server-1
     volumes:
       - /home/neonvariant/docker/foundry:/data
