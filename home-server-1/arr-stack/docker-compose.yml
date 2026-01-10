@@ -276,7 +276,7 @@ services:
     restart: unless-stopped
 
   dumpsterr:
-    image: neonvariant/dumpsterr:latest
+    image: neonvariant/dumpsterr:main
     container_name: dumpsterr
     volumes:
       # Mount your config file
