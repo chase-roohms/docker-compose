@@ -1,7 +1,7 @@
 services:
   mythicmate:
     image: neonvariant/mythicmate:main
-    container_name: mythicmate-bot
+    container_name: mythicmate
     restart: unless-stopped
     environment:
       - MYTHICMATE_TOKEN=${MYTHICMATE_TOKEN}
