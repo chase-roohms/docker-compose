@@ -1,0 +1,11 @@
+services:
+  mythicmate:
+    image: neonvariant/mythicmate:main
+    container_name: mythicmate-bot
+    restart: unless-stopped
+    environment:
+      - MYTHICMATE_TOKEN=${MYTHICMATE_TOKEN}
+      - MYTHICMATE_PASSWORD=${MYTHICMATE_PASSWORD}
+      - MYTHICMATE_GPT_KEY=${MYTHICMATE_GPT_KEY}
+    volumes:
+      - /home/neonvariant/docker/mythicmate/database:/app/database
