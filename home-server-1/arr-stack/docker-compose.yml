@@ -280,7 +280,8 @@ services:
     container_name: dumpsterr
     volumes:
       # Mount your config file
-      - ${ARR_STACK_ROOT_DIR}/dumpsterr/data/config.yml:/app/data/config.yml:ro
+      - ${ARR_STACK_ROOT_DIR}/dumpsterr/config.yml:/app/data/config.yml:ro
+      - ${ARR_STACK_ROOT_DIR}/dumpsterr/metrics:/app/metrics
       # Mount your media directories (adjust paths as needed)
       # Add more directories as required, ensuring they match those in config.yml
       - ${PLEX_MEDIA_ROOT_DIR}/movies:/media/movies:ro
