@@ -6,10 +6,13 @@ services:
     ports:
         - 3313:3313
     volumes:
-      - /home/neonvariant/docker/transmute/data:/app/data
+      - transmute_data:/data
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:3319/api/health/ready"]
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 40s
+
+volumes:
+  transmute_data:
