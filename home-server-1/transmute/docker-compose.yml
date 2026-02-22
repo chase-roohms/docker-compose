@@ -1,0 +1,15 @@
+services:
+  transmute:
+    image: ghcr.io/transmute-app/transmute:main
+    container_name: transmute
+    restart: unless-stopped
+    ports:
+        - 3313:3313
+    volumes:
+      - /home/neonvariant/docker/transmute/data:/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3319/health/ready"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
