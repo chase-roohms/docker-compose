@@ -8,7 +8,7 @@ services:
     volumes:
       - /home/neonvariant/docker/transmute/data:/app/data
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3319/health/ready"]
+      test: ["CMD", "curl", "-f", "http://localhost:3319/api/health/ready"]
       interval: 30s
       timeout: 10s
       retries: 3
