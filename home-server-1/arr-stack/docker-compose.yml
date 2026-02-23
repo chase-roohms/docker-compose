@@ -133,16 +133,19 @@ services:
 #    volumes:
 #      - ${ARR_STACK_ROOT_DIR}/tunarr/data:/config
 
-  huntarr:
-    image: huntarr/huntarr:latest
-    container_name: huntarr
-    restart: always
-    ports:
-      - 9077:9705
-    environment:
-      - TZ=${TZ}
-    volumes:
-      - ${ARR_STACK_ROOT_DIR}//huntarr:/config
+# Drama: https://www.reddit.com/r/selfhosted/comments/1rcmgnn/the_huntarr_github_page_has_been_taken_down/
+# And: https://www.reddit.com/r/selfhosted/comments/1rckopd/huntarr_your_passwords_and_your_entire_arr_stacks/
+# Taking down for now, looks like this app is being swept under the rug
+#  huntarr:
+#    image: huntarr/huntarr:latest
+#    container_name: huntarr
+#    restart: always
+#    ports:
+#      - 9077:9705
+#    environment:
+#      - TZ=${TZ}
+#    volumes:
+#      - ${ARR_STACK_ROOT_DIR}/huntarr:/config
 
   bazarr:           # Subtitles
     # Docs: https://wiki.bazarr.media/
