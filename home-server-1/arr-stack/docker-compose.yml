@@ -237,19 +237,19 @@ services:
               capabilities: [gpu]
     restart: unless-stopped
 
-  wizarr:            # Plex Invite Manager
-    # Docs: https://docs.wizarr.dev/
-    container_name: wizarr
-    image: ghcr.io/wizarrrr/wizarr
-    ports:
-      - 9095:5690
-    volumes:
-      - ${ARR_STACK_ROOT_DIR}/wizarr/database:/data/database
-      - ${ARR_STACK_ROOT_DIR}/wizarr/wizard:/data/wizard_steps
-    environment:
-      - APP_URL=https://invite.${DOMAIN}
-      - DISABLE_BUILTIN_AUTH=false
-      - TZ=${TZ}
+  #wizarr:            # Plex Invite Manager
+  #  # Docs: https://docs.wizarr.dev/
+  #  container_name: wizarr
+  #  image: ghcr.io/wizarrrr/wizarr
+  #  ports:
+  #    - 9095:5690
+  #  volumes:
+  #    - ${ARR_STACK_ROOT_DIR}/wizarr/database:/data/database
+  #    - ${ARR_STACK_ROOT_DIR}/wizarr/wizard:/data/wizard_steps
+  #  environment:
+  #    - APP_URL=https://invite.${DOMAIN}
+  #    - DISABLE_BUILTIN_AUTH=false
+  #    - TZ=${TZ}
 
   metube:            # YouTube video downloader
     # Docs: https://github.com/alexta69/metube/wiki
