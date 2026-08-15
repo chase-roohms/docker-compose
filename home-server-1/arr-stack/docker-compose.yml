@@ -269,7 +269,7 @@ services:
     restart: unless-stopped
 
   recyclarr:
-    image: recyclarr/recyclarr:latest
+    image: recyclarr/recyclarr:8
     container_name: recyclarr
     user: 1000:1000
     volumes:
