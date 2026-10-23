@@ -9,3 +9,15 @@ services:
     restart: unless-stopped
     privileged: true
     network_mode: host
+
+  matter-server:
+    image: ghcr.io/home-assistant-libs/python-matter-server:stable
+    container_name: matter-server
+    restart: unless-stopped
+    # Required for Matter discovery (mDNS / IPv6)
+    network_mode: host
+    security_opt:
+      - apparmor:unconfined
+    volumes:
+      - /home/neonvariant/docker/home-assistant-matter:/data
+      - /run/dbus:/run/dbus:ro
