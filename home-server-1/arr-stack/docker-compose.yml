@@ -219,24 +219,6 @@ services:
       - ${ARR_STACK_ROOT_DIR}/kometa/config:/config
     restart: unless-stopped
 
-  whisperasr:       # AI subtitle generation for Bazarr
-    # Docs: https://wiki.bazarr.media/Additional-Configuration/Whisper-Provider/
-    image: onerahmet/openai-whisper-asr-webservice:latest-gpu
-    container_name: whisper-ai
-    ports:
-      - 9094:9000
-    environment:
-      - ASR_MODEL=small
-      - ASR_ENGINE=faster_whisper
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: 1
-              capabilities: [gpu]
-    restart: unless-stopped
-
   #wizarr:            # Plex Invite Manager
   #  # Docs: https://docs.wizarr.dev/
   #  container_name: wizarr
