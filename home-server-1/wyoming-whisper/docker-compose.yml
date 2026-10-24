@@ -1,0 +1,15 @@
+services:
+  wyoming-whisper:
+    image: lscr.io/linuxserver/faster-whisper:latest
+    container_name: wyoming-whisper
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Chicago
+      - WHISPER_MODEL=tiny-int8
+      - WHISPER_BEAM=1
+    volumes:
+      - /home/neonvariant/docker/wyoming-whisper:/config
+    ports:
+      - "10300:10300"
+    restart: unless-stopped
