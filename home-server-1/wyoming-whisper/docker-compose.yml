@@ -1,6 +1,6 @@
 services:
   wyoming-whisper:
-    image: lscr.io/linuxserver/faster-whisper:latest
+    image: linuxserver/faster-whisper:latest
     container_name: wyoming-whisper
     environment:
       - PUID=1000
