@@ -30,8 +30,12 @@ services:
       - PGID=1000
       - TZ=America/Chicago
       - PIPER_VOICE=en_US-libritts_r-medium
+      - PIPER_LENGTH=0.95
+      - PIPER_NOISE=0.667
+      - PIPER_NOISEW=0.333
+      - PIPER_SPEAKER=0
     volumes:
-      - ./piper:/config
+      - /home/neonvariant/docker/piper:/config
     ports:
       - "10200:10200"
     restart: unless-stopped
