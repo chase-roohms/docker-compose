@@ -13,3 +13,17 @@ services:
     ports:
       - "10300:10300"
     restart: unless-stopped
+
+  wyoming-piper:
+    image: lscr.io/linuxserver/piper:latest
+    container_name: wyoming-piper
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Chicago
+      - PIPER_VOICE=en_US-lessac-medium
+    volumes:
+      - ./piper:/config
+    ports:
+      - "10200:10200"
+    restart: unless-stopped
