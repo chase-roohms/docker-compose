@@ -1,17 +1,25 @@
 services:
   wyoming-whisper:
-    image: linuxserver/faster-whisper:latest
+    image: linuxserver/faster-whisper:gpu
     container_name: wyoming-whisper
     environment:
       - PUID=1000
       - PGID=1000
       - TZ=America/Chicago
-      - WHISPER_MODEL=tiny-int8
+      - WHISPER_MODEL=small
+      - WHISPER_LANG=en
       - WHISPER_BEAM=1
     volumes:
       - /home/neonvariant/docker/wyoming-whisper:/config
     ports:
       - "10300:10300"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
     restart: unless-stopped
 
   wyoming-piper:
@@ -21,7 +29,7 @@ services:
       - PUID=1000
       - PGID=1000
       - TZ=America/Chicago
-      - PIPER_VOICE=en_US-lessac-medium
+      - PIPER_VOICE=en_US-libritts_r-medium
     volumes:
       - ./piper:/config
     ports:
