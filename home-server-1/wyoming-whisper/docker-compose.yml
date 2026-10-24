@@ -33,7 +33,7 @@ services:
       - PIPER_LENGTH=0.95
       - PIPER_NOISE=0.667
       - PIPER_NOISEW=0.333
-      - PIPER_SPEAKER=0
+      - PIPER_SPEAKER=166
     volumes:
       - /home/neonvariant/docker/piper:/config
     ports:
