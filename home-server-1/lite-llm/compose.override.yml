@@ -1,6 +1,6 @@
 services:
   litellm:
     volumes:
-      - ./config.yaml:/app/config.yaml:ro
+      - ./config.yml:/app/config.yaml:ro
     command:
       - "--config=/app/config.yaml"
