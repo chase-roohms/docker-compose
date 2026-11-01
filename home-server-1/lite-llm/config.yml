@@ -1,3 +1,16 @@
 general_settings:
   master_key: os.environ/LITELLM_MASTER_KEY
   disable_env_credential_login: true
+
+router_settings:
+  redis_host: os.environ/REDIS_HOST
+  redis_port: os.environ/REDIS_PORT
+  redis_password: os.environ/REDIS_PASSWORD
+
+litellm_settings:
+  cache: true
+  cache_params:
+    type: redis
+    host: os.environ/REDIS_HOST
+    port: os.environ/REDIS_PORT
+    password: os.environ/REDIS_PASSWORD
