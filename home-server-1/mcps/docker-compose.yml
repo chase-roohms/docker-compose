@@ -40,3 +40,29 @@ services:
       timeout: 5s
       retries: 3
       start_period: 60s
+
+  legendkeeper-mcp:
+    image: ghcr.io/chase-roohms/legendkeeper-mcp:latest
+    restart: unless-stopped
+
+    # Private LAN binding; LiteLLM connects via http://<home-server-1-ip>:8993/mcp.
+    ports:
+      - "${MCP_BIND_IP:?Set MCP_BIND_IP in .env}:${LEGENDKEEPER_MCP_PORT:-8993}:8000"
+
+    environment:
+      LEGENDKEEPER_API_KEY: ${LEGENDKEEPER_API_KEY:?Set LEGENDKEEPER_API_KEY in .env}
+      LEGENDKEEPER_READ_ONLY: ${LEGENDKEEPER_READ_ONLY:-true}
+      MCP_TRANSPORT: http
+      MCP_HOST: 0.0.0.0
+      MCP_PORT: "8000"
+      MCP_PATH: /mcp
+      MCP_AUTH_TOKEN: ${LEGENDKEEPER_MCP_AUTH_TOKEN:?Set LEGENDKEEPER_MCP_AUTH_TOKEN in .env}
+
+    # Restrict the MCP process to a read-only filesystem and no extra capabilities.
+    read_only: true
+    tmpfs:
+      - /tmp
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
