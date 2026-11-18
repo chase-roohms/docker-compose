@@ -1,0 +1,42 @@
+name: mcps
+
+services:
+  gramps-mcp:
+    image: ghcr.io/scormave/gramps-web-mcp:2.10.1
+    restart: unless-stopped
+
+    # Gramps Web runs in another Compose stack and publishes port 8991.
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+    # Private LAN binding; never forward this port on the router.
+    # LiteLLM can reach this at http://<home-server-1-ip>:8992/mcp.
+    ports:
+      - "${MCP_BIND_IP:?Set MCP_BIND_IP in .env}:${GRAMPS_MCP_PORT:-8992}:8080"
+
+    environment:
+      GRAMPS_API_URL: ${GRAMPS_API_URL:-http://host.docker.internal:8991}
+      GRAMPS_USERNAME: ${GRAMPS_USERNAME:?Set GRAMPS_USERNAME in .env}
+      GRAMPS_PASSWORD: ${GRAMPS_PASSWORD:?Set GRAMPS_PASSWORD in .env}
+      GRAMPS_TREE_ID: ${GRAMPS_TREE_ID:?Set GRAMPS_TREE_ID in .env}
+
+      # Start read-only; change intentionally after verifying backups.
+      GRAMPS_READ_ONLY: ${GRAMPS_READ_ONLY:-true}
+      GRAMPS_MUTATION_SERIALIZE: "true"
+      GRAMPS_MUTATION_MIN_INTERVAL_MS: "250"
+      # With stateless HTTP, required confirmation blocks delete/merge/undo.
+      GRAMPS_CONFIRMATION: required
+
+      MCP_TRANSPORT: http
+      MCP_STATELESS: "true"
+      ASPNETCORE_URLS: http://0.0.0.0:8080
+      MCP_PATH: /mcp
+      MCP_API_KEY: ${MCP_API_KEY:?Set MCP_API_KEY in .env}
+      GRAMPS_LOG_LEVEL: Information
+
+    healthcheck:
+      test: ["CMD", "dotnet", "/app/GrampsWeb.Mcp.dll", "--health-check"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 60s
