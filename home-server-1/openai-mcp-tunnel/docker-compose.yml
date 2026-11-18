@@ -1,0 +1,26 @@
+name: openai-mcp-tunnel
+
+services:
+  tunnel-client:
+    image: ghcr.io/openai/tunnel-client:v0.0.21
+    restart: unless-stopped
+
+    # Secure MCP Tunnel connects outbound to OpenAI; no host ports are exposed.
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+    environment:
+      CONTROL_PLANE_TUNNEL_ID: ${CONTROL_PLANE_TUNNEL_ID:?Set CONTROL_PLANE_TUNNEL_ID in .env}
+      CONTROL_PLANE_API_KEY: ${CONTROL_PLANE_API_KEY:?Set CONTROL_PLANE_API_KEY in .env}
+
+      # Reach the existing LiteLLM host port without modifying its Compose stack.
+      MCP_SERVER_URL: ${MCP_SERVER_URL:-http://host.docker.internal:4000/mcp}
+
+      # Resolve the dedicated LiteLLM virtual key from the container environment.
+      # Keep Authorization available for upstream MCP OAuth credentials.
+      MCP_EXTRA_HEADERS: "x-litellm-api-key: env:LITELLM_MCP_AUTH_HEADER"
+      LITELLM_MCP_AUTH_HEADER: "Bearer ${LITELLM_MCP_KEY:?Set LITELLM_MCP_KEY in .env}"
+      MCP_OAUTH_DISCOVERY: "disabled"
+
+      LOG_LEVEL: info
+      LOG_FORMAT: json
