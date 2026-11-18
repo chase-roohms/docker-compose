@@ -16,9 +16,9 @@ services:
       # Reach the existing LiteLLM host port without modifying its Compose stack.
       MCP_SERVER_URL: ${MCP_SERVER_URL:-http://host.docker.internal:4000/mcp}
 
-      # Resolve the dedicated LiteLLM virtual key from the container environment.
-      # Keep Authorization available for upstream MCP OAuth credentials.
-      MCP_EXTRA_HEADERS: "x-litellm-api-key: env:LITELLM_MCP_AUTH_HEADER"
+      # Authenticate to LiteLLM with a dedicated virtual key.
+      # In ChatGPT, select no authentication for this tunnel-backed plugin.
+      MCP_EXTRA_HEADERS: "Authorization: env:LITELLM_MCP_AUTH_HEADER"
       LITELLM_MCP_AUTH_HEADER: "Bearer ${LITELLM_MCP_KEY:?Set LITELLM_MCP_KEY in .env}"
       MCP_OAUTH_DISCOVERY: "disabled"
 
