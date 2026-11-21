@@ -83,7 +83,7 @@ services:
 
   sonarr:           # Shows
     # Docs: https://wiki.servarr.com/sonarr
-    image: lscr.io/linuxserver/sonarr:latest
+    image: lscr.io/linuxserver/sonarr:develop
     container_name: sonarr
     ports:
       - 9072:9072
